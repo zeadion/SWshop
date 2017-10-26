@@ -3,40 +3,78 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title - SWshop</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
-<body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
+<body>    
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>                        
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("SW Shop", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <div class="navbar-collapse collapse">
+            <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("Product", "Index", "Products")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        @{
+                            var cartCount = ReferenceEquals(@Session["cartCount"], null) ? "0" : @Session["cartCount"].ToString();
+                        }
+                        <a href="@Url.Action("Index", "Cart")"><span class="glyphicon glyphicon-shopping-cart"></span> Cart(<span id="cartCount">@cartCount</span>)</a>
+                    </li>
                 </ul>
             </div>
         </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5 alert alert-success alert-fixed" id="alert_template" style="-ms-opacity: 0; opacity: 0; display: none;">
+                <button type="button" class="close" aria-label="Close">×</button>
+            </div>
+        </div>
     </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
-    </div>
+    @RenderBody()
+    <footer class="navbar-fixed-bottom text-center">
+        <p>&copy; @DateTime.Now.Year - SW Shop</p>
+    </footer>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/bootbox")
     @RenderSection("scripts", required: false)
+<script>
+    $(function() {
+        var cartCount = $("#cartCount");
+        var timeoutHandler;
+        $('#alert_template .close').click(function (e) {
+
+            disposeAlert();
+        });
+    });
+
+    function showAlert(message) {
+        var span = $("#alert_template").find("span")[0];
+        if (!span) {
+            $("#alert_template button").after("<span>" + message + "</span>");
+            $("#alert_template").show(200).animate({ opacity: 0.7 }, 400);
+            window.timeoutHandler = setTimeout(window.disposeAlert, 3000);
+        } else {
+            $(span).html(message);
+            window.clearTimeout(timeoutHandler);
+            window.timeoutHandler = setTimeout(window.disposeAlert, 3000);
+        }
+    }
+    function disposeAlert() {
+        $("#alert_template").animate({ opacity: 0 }, 400).hide(200);
+        $("#alert_template span").remove();
+    }
+</script>
 </body>
 </html>

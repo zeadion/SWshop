@@ -1,5 +1,4 @@
-﻿using SWshop.Domain.Interfaces;
-using SWshop.Infra.Data.Context;
+﻿using SWshop.Infra.Data.Context;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -21,7 +20,7 @@ namespace SWshop.Infra.Data.Repositories
 
         public TEntity GetById(int id)
         {
-            return Db.Set<TEntity>().Find();
+            return Db.Set<TEntity>().Find(id);
         }
 
         public IEnumerable<TEntity> GetAll()

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SWshop.Domain.Entities;
 using SWshop.Domain.Interfaces.Repositories;
 using SWshop.Domain.Interfaces.Services;

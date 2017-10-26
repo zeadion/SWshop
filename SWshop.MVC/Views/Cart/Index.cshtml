@@ -1,0 +1,133 @@
+﻿@model SWshop.MVC.ViewModels.CartViewModel
+
+@{
+    ViewBag.Title = "Shopping Cart";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th class="text-center">Unit</th>
+                    <th class="text-center">Total</th>
+                    <th class="text-center">Promotion Applied</th>
+                    <th>Select Promotion</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @{ int i = 0;}
+                @foreach (var cartItem in Model.CartItems)
+                {
+                    <tr id="@i">
+                        <td class="col-md-3">
+                            <input name="productId" value="@cartItem.Product.Id" type="hidden"/>
+                            @Html.DisplayFor(modelItem => cartItem.Product.Name)
+                        </td>
+                        <td class="col-md-1" style="text-align: center">
+                            <input type="number" class="form-control" value="@cartItem.Count" onchange="updateItem(@i)" name="count" min="0" required="required">
+                        </td>
+                        <td class="col-md-1 text-center">
+                            <span name="productPrice">@Html.DisplayFor(modelItem => cartItem.Product.Price)</span>
+                        </td>
+                        @{var rPrice = cartItem.GetRegularPrice();}
+                        <td class="col-md-1 text-danger text-center">
+                            <strong id="regularItemPrice_@i">R$ @rPrice</strong>
+                        </td>
+                        @{var pPrice = cartItem.GetPromotionPrice();}
+                        <td class="col-md-2 text-success text-center">
+                            <strong id="promotionItemPrice_@i">R$ @pPrice</strong>
+                        </td>
+                        <td class="col-md-2">
+                        <select id="promotion_@i" class="form-control" onchange="updateItem(@i)">
+                            <option value="no">No promotion</option>
+                            <option value="pro1">Pay 1, take 2 </option>
+                            <option value="pro2">3 for R$ 10, 00</option>
+                        </select>
+                            </td>
+                        <td class="col-md-1">
+                            <button type="button" class="close" name="removeBtn" onclick="removeFromCart(@i)">×</button>
+                        </td>
+                        
+                    </tr>
+                    i++;
+                }
+                    <tr class="warning">
+                        <td colspan="3" class="col-md-6">
+                            <strong>Total:</strong>
+                        </td>
+                        <td id="regularTotal" class="col-md-1 text-danger text-center">
+                            @{ var regularTotal = Model.CartTotal();}
+                            <strong id="regularTotalPrice">R$ @regularTotal</strong>
+                        </td>
+                        <td id="promotionTotal" class="col-md-1 text-success text-center">
+                            @{ var promotionTotal = Model.CartPromotionTotal();}
+                            <strong id="promotionTotalPrice">R$ @promotionTotal</strong>
+                        </td>
+                        <td colspan="2" class="col-md-2"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-12 text-center">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary"><span class="glyphicon glyphicon-backward"></span> Back</a>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+
+        function updateItem(i) {
+            var count = parseInt($("tr#" + i + " input[name=count]").val());
+            var productId = parseInt($("tr#" + i + " input[name=productId]").val());
+            var promotion = $("select#promotion_" + i).val();
+            
+            $.ajax({
+                url: '@Url.Action("UpdateCart", "Cart")/' + productId + '?count=' + count + '&promotion=' + promotion, success: function (result) {
+                    result = JSON.parse(result);
+                    $(window.cartCount).html(result.cartCount);
+                    $("#regularItemPrice_"+i).html("R$ " + result.regularItemPrice.replace(".", ","));
+                    $("#promotionItemPrice_"+i).html("R$ " + result.promotionItemPrice.replace(".", ","));
+                    $("#regularTotalPrice").html("R$ " + result.regularTotalPrice.replace(".", ","));
+                    $("#promotionTotalPrice").html("R$ " + result.promotionTotalPrice.replace(".", ","));
+                    window.showAlert("Cart updated!");
+
+                }
+            });
+
+        }
+
+        
+        function removeFromCart(i) {
+            var productId = parseInt($("tr#" + i + " input[name=productId]").val());
+            bootbox.confirm({
+                size: "small",
+                message: "Are you sure?",
+                backdrop: true,
+                callback: function(confirmed) {
+                    if (confirmed) {
+                        $.ajax({
+                            url: '@Url.Action("RemoveFromCart", "Cart")/' + productId, success: function (result) {
+                                result = JSON.parse(result);
+                                $(window.cartCount).html(result.cartCount);
+                                $("#regularTotalPrice").html("R$ " + result.regularTotalPrice.replace(".", ","));
+                                $("#promotionTotalPrice").html("R$ " + result.promotionTotalPrice.replace(".", ","));
+                                $("tr#" + i).animate({ opacity: 0 }, 400).hide(200, function () { this.remove(); });
+                                window.showAlert("Product removed successfully!");
+
+                            }
+                        });
+                    }
+
+                }
+            });
+        }
+        
+    </script>
+}

@@ -1,30 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.Web.Mvc;
+using AutoMapper;
+using SWshop.Application.Interface;
+using SWshop.Domain.Entities;
+using SWshop.MVC.Models;
+using SWshop.MVC.ViewModels;
 
 namespace SWshop.MVC.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IProductAppService _productApp;
+
+        public HomeController(IProductAppService productApp)
+        {
+            _productApp = productApp;
+        }
+
         public ActionResult Index()
         {
-            return View();
+            var productViewModel = Mapper.Map<IEnumerable<Product>, IEnumerable<ProductViewModel>>(_productApp.GetAll());
+            return View(productViewModel);
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
 
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
     }
 }

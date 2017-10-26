@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using SWshop.Application.Interface;
 using SWshop.Domain.Entities;
 using SWshop.Domain.Interfaces.Services;

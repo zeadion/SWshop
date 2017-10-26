@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using SWshop.Domain.Entities;
-using SWshop.Domain.Interfaces;
 using System.Linq;
 using SWshop.Domain.Interfaces.Repositories;
 
